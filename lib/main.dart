@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proje1/locator.dart';
 import 'package:proje1/presantation/home/admin_home.dart';
 import 'package:proje1/presantation/home/candidate_home.dart';
 import 'package:proje1/presantation/home/jury_home.dart';
@@ -12,6 +13,7 @@ import 'presantation/login/jury_login.dart';
 import 'presantation/login/manager_login.dart';
 
 void main() {
+  setupLocators();
   runApp(const MyApp());
 }
 
@@ -38,10 +40,7 @@ final GoRouter _router = GoRouter(
       path: '/home/candidate',
       builder: (context, state) => const CandidateHome(),
     ),
-    GoRoute(
-      path: '/home/admin',
-      builder: (context, state) => const AdminHome(),
-    ),
+    GoRoute(path: '/home/admin', builder: (context, state) => AdminHome()),
     GoRoute(
       path: '/home/manager',
       builder: (context, state) => const ManagerHome(),
