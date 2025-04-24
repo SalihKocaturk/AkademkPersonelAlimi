@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../cubits/juri_cubit.dart';
 
-class JuriPanelEkrani extends StatelessWidget {
-  const JuriPanelEkrani({super.key});
+import '../../domain/cubits/juri_cubit.dart';
+
+class JuryHome extends StatelessWidget {
+  const JuryHome({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,30 +38,39 @@ class _JuriPanelBodyState extends State<JuriPanelBody> {
         child: BlocConsumer<JuriCubit, JuriState>(
           listener: (context, state) {
             if (state is JuriDegerlendirmeEksik) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.mesaj)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.mesaj)));
             }
             if (state is JuriDegerlendirmeTamamlandi) {
               showDialog(
                 context: context,
-                builder: (_) => AlertDialog(
-                  title: const Text('Tamamlandı'),
-                  content: const Text('Değerlendirme başarıyla gönderildi.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Kapat'),
+                builder:
+                    (_) => AlertDialog(
+                      title: const Text('Tamamlandı'),
+                      content: const Text(
+                        'Değerlendirme başarıyla gönderildi.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Kapat'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               );
             }
           },
           builder: (context, state) {
             return ListView(
               children: [
-                Text('🧑‍🎓 Aday: $_mockAdayAdi', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  '🧑‍🎓 Aday: $_mockAdayAdi',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 Text('📌 Kadro Türü: $_mockKadro'),
                 const SizedBox(height: 16),
 
@@ -72,7 +82,8 @@ class _JuriPanelBodyState extends State<JuriPanelBody> {
                     border: OutlineInputBorder(),
                     hintText: 'Aday hakkında değerlendirme notunuzu yazın...',
                   ),
-                  onChanged: (val) => context.read<JuriCubit>().notGuncelle(val),
+                  onChanged:
+                      (val) => context.read<JuriCubit>().notGuncelle(val),
                 ),
                 const SizedBox(height: 16),
 
@@ -111,7 +122,9 @@ class _JuriPanelBodyState extends State<JuriPanelBody> {
                 const SizedBox(height: 24),
 
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                  ),
                   onPressed: () {
                     context.read<JuriCubit>().tamamlaDegerlendirme();
                   },
