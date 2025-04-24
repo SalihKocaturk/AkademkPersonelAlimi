@@ -69,3 +69,4 @@ class KadroKriter {
     );
   }
 }
+>>>>>>> 5c821c750a19a9ba4c3ea27150464bcc7ff958dc
