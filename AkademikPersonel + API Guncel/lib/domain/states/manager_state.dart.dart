@@ -4,24 +4,23 @@ abstract class YoneticiState {}
 
 class YoneticiInitial extends YoneticiState {}
 
-class YoneticiYukleniyor extends YoneticiState {}
+class YoneticiKriterlerYukleniyor extends YoneticiState {}
 
-class YoneticiYuklendi extends YoneticiState {
+class YoneticiBasvurularYukleniyor extends YoneticiState {}
+
+class YoneticiJuriAtamaYukleniyor extends YoneticiState {}
+
+class YoneticiBilgileriYuklendi extends YoneticiState {
   final List<KadroKriter> kriterListesi;
-
-  YoneticiYuklendi(this.kriterListesi);
+  final List<Basvuru> basvurular;
+  final List<JuriIlan> juriIlanListesi;
+  final List<JuriKullanicilar> juriKullaniciListesi;
+  YoneticiBilgileriYuklendi(this.kriterListesi, this.basvurular, this.juriIlanListesi, this.juriKullaniciListesi);
 }
 
 class YoneticiHata extends YoneticiState {
   final String mesaj;
 
   YoneticiHata(this.mesaj);
-}
-
-//İLAN GÖRÜNTÜLE---------------------------------
-class YoneticiBasvurularYuklendi extends YoneticiState {
-  final List<Basvuru> basvurular;
-
-  YoneticiBasvurularYuklendi(this.basvurular);
 }
 

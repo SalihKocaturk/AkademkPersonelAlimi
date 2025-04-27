@@ -175,6 +175,98 @@ app.put('/basvurular/:basvuruID', (req, res) => {
   });
 });
 
+// İlanları listeleme
+app.get('/ilanlar', (req, res) => {
+  const query = `SELECT IlanID, Baslik, Aciklama, BaslangicTarihi, BitisTarihi FROM ilanlar`;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('İlanlar çekilemedi:', err);
+      return res.status(500).json({ hata: 'Sunucu hatası' });
+    }
+    res.json(results);
+  });
+});
+
+app.get('/kullanicijuri', (req, res) => {
+  const query = `SELECT KullaniciID,Ad,Soyad, TCKimlikNo FROM kullanicilar WHERE RolID = 4`;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('İlanlar çekilemedi:', err);
+      return res.status(500).json({ hata: 'Sunucu hatası' });
+    }
+    res.json(results);
+  });
+});
+
+app.post('/juri-atama', (req, res) => {
+  const { IlanID, TCKimlikNo } = req.body;
+
+  // Önce TC Kimlik No'ya göre KullaniciID bulunacak
+  const findUserQuery = `
+    SELECT KullaniciID 
+    FROM kullanicilar 
+    WHERE TCKimlikNo = ?
+  `;
+
+  db.query(findUserQuery, [TCKimlikNo], (err, results) => {
+    if (err) {
+      console.error('Kullanıcı bulunamadı:', err);
+      return res.status(500).json({ hata: 'Sunucu hatası' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ hata: 'TC Kimlik No ile kullanıcı bulunamadı.' });
+    }
+
+    const JuriUyesiID = results[0].KullaniciID;
+    const AtayanYoneticiID = 4; // Şimdilik sabit atıyoruz
+
+    const insertQuery = `
+      INSERT INTO juriatamalari 
+      (IlanID, JuriUyesiID, AtayanYoneticiID, AtamaTarihi)
+      VALUES (?, ?, ?, NOW())
+    `;
+
+    db.query(insertQuery, [IlanID, JuriUyesiID, AtayanYoneticiID], (insertErr, insertResult) => {
+      if (insertErr) {
+        console.error('Atama yapılamadı:', insertErr);
+        return res.status(500).json({ hata: 'Sunucu hatası' });
+      }
+
+      res.status(201).json({ mesaj: 'Jüri ataması başarıyla yapıldı.', atamaID: insertResult.insertId });
+    });
+  });
+});
+//-------------------------JÜRİ GİRİŞ VE VERİLER-----------------------------------
+app.post('/jurigiris', (req, res) => {
+  const { TCKimlikNo, Sifre } = req.body;
+
+  const query = `
+    SELECT KullaniciID, Ad, Soyad, RolID
+    FROM kullanicilar
+    WHERE TCKimlikNo = ? AND Sifre = ? AND RolID = 4
+  `;
+
+  db.query(query, [TCKimlikNo, Sifre], (err, results) => {
+    if (err) {
+      console.error('Giriş hatası:', err);
+      return res.status(500).json({ hata: 'Sunucu hatası' });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ hata: 'Geçersiz bilgiler veya jüri yetkiniz yok.' });
+    }
+
+    const user = results[0];
+    res.status(200).json({
+      mesaj: 'Giriş başarılı',
+      kullaniciID: user.KullaniciID,
+      adSoyad: `${user.Ad} ${user.Soyad}`,
+      rolID: user.RolID
+    });
+  });
+});
+
 
 
 app.listen(port, () => {

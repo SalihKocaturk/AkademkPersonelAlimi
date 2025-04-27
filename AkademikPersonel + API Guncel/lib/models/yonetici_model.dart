@@ -108,6 +108,72 @@ class JuriUyesi {
 
 //------------BAŞVURULARI İNCELE-----------------
 
+class JuriKullanicilar{
+  final int? kullaniciID;
+  final String juriAdSoyad;
+  final String? tcKimlik;
+
+
+  JuriKullanicilar({
+    required this.kullaniciID,
+    required this.juriAdSoyad,
+    required this.tcKimlik,
+  });
+  factory JuriKullanicilar.fromJson(Map<String, dynamic> json){
+    return JuriKullanicilar(
+      kullaniciID: json['kullaniciID'],
+      juriAdSoyad: '${json['Ad']} ${json['Soyad']}',
+      tcKimlik: json['TCKimlikNo'],
+
+      );
+  }
+}
+
+class JuriIlan{
+  final int? ilanID;
+  final String baslik;
+  final String aciklama;
+  final String baslangicTarihi;
+  final String bitisTarihi;
+
+  JuriIlan({
+    required this.ilanID,
+    required this.baslik,
+    required this.aciklama,
+    required this.baslangicTarihi,
+    required this.bitisTarihi
+
+  });
+
+  factory JuriIlan.fromJson(Map<String, dynamic> json) {
+  return JuriIlan(
+    ilanID: json['IlanID'],
+    baslik: json['Baslik'],
+    aciklama: json['Aciklama'],
+    baslangicTarihi: json['BaslangicTarihi'],
+    bitisTarihi: json['BitisTarihi']
+  );
+}
+}
+
+class JuriAtamaModel {
+  final int? ilanID;
+  final String? tcKimlikNo;
+
+  JuriAtamaModel({
+    required this.ilanID,
+    required this.tcKimlikNo,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'IlanID': ilanID,
+      'TCKimlikNo': tcKimlikNo,
+    };
+  }
+}
+
+
 class Basvuru {
   final int basvuruID;
   final String adayAdSoyad;
@@ -153,6 +219,6 @@ factory Basvuru.fromJson(Map<String, dynamic> json) {
     sonGuncelleme: json['SonGuncelleme'],
   );
 }
-
 }
+
 

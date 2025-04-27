@@ -77,7 +77,7 @@ class _ManagerKriterEkraniState extends State<ManagerKriterEkrani> {
   @override
   void initState() {
     super.initState();
-    context.read<ManagerCubit>().kriterleriSunucudanGetir();
+    context.read<ManagerCubit>().basvuruKriterYukle();
   }
 
   @override
@@ -105,9 +105,9 @@ class _ManagerKriterEkraniState extends State<ManagerKriterEkrani> {
       ),
       body: BlocBuilder<ManagerCubit, YoneticiState>(
         builder: (context, state) {
-          if (state is YoneticiYukleniyor) {
+          if (state is YoneticiKriterlerYukleniyor) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is YoneticiYuklendi) {
+          } else if (state is YoneticiBilgileriYuklendi) {
             if (state.kriterListesi.isEmpty) {
               return const Center(
                 child: Text(
@@ -146,11 +146,7 @@ class _ManagerKriterEkraniState extends State<ManagerKriterEkrani> {
                           icon: const Icon(Icons.edit, color: Colors.blue),
                           onPressed: () {
                             final kriter = state.kriterListesi[index];
-                            final cubit =
-                                context
-                                    .read<
-                                      ManagerCubit
-                                    >();
+                            final cubit = context.read<ManagerCubit>();
                             showDialog(
                               context: context,
                               builder:
@@ -560,32 +556,14 @@ class ManagerBasvuruDurumuEkrani extends StatelessWidget {
   }
 }
 
-/// Model: İlan
-class Ilan {
-  final String id;
-  final String role;
-  final String title;
-  final String description;
-  final String pdfUrl;
-  String? finalDecision;
-
-  Ilan({
-    required this.id,
-    required this.role,
-    required this.title,
-    required this.description,
-    required this.pdfUrl,
-    this.finalDecision,
-  });
-}
-
 class ManagerIlanIncelemeEkrani extends StatefulWidget {
   // ignore: use_super_parameters
   const ManagerIlanIncelemeEkrani({Key? key}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
-  _ManagerIlanIncelemeEkraniState createState() => _ManagerIlanIncelemeEkraniState();
+  _ManagerIlanIncelemeEkraniState createState() =>
+      _ManagerIlanIncelemeEkraniState();
 }
 
 class _ManagerIlanIncelemeEkraniState extends State<ManagerIlanIncelemeEkrani> {
@@ -595,77 +573,78 @@ class _ManagerIlanIncelemeEkraniState extends State<ManagerIlanIncelemeEkrani> {
     // Sayfa açılır açılmaz verileri yükle
     Future.microtask(() {
       // ignore: use_build_context_synchronously
-      context.read<ManagerCubit>().basvurulariYukle();
+      context.read<ManagerCubit>().basvuruKriterYukle();
     });
   }
-Widget _buildDecisionDialogContent(Basvuru basvuru) {
-  String? selectedDecision = basvuru.durum;
 
-  return StatefulBuilder(
-    builder: (context, setState) {
-      return AlertDialog(
-        title: const Text('Nihai Kararı Belirle'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: const Text('Onaylandı'),
-              value: 'Onaylandı',
-              groupValue: selectedDecision,
-              onChanged: (value) {
-                setState(() {
-                  selectedDecision = value;
-                });
-              },
+  Widget _buildDecisionDialogContent(Basvuru basvuru) {
+    String? selectedDecision = basvuru.durum;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return AlertDialog(
+          title: const Text('Nihai Kararı Belirle'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text('Onaylandı'),
+                value: 'Onaylandı',
+                groupValue: selectedDecision,
+                onChanged: (value) {
+                  setState(() {
+                    selectedDecision = value;
+                  });
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Reddedildi'),
+                value: 'Reddedildi',
+                groupValue: selectedDecision,
+                onChanged: (value) {
+                  setState(() {
+                    selectedDecision = value;
+                  });
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('İptal'),
             ),
-            RadioListTile<String>(
-              title: const Text('Reddedildi'),
-              value: 'Reddedildi',
-              groupValue: selectedDecision,
-              onChanged: (value) {
-                setState(() {
-                  selectedDecision = value;
-                });
+            ElevatedButton(
+              onPressed: () {
+                if (selectedDecision != null) {
+                  context.read<ManagerCubit>().basvuruDurumGuncelle(
+                    basvuru.basvuruID,
+                    selectedDecision!,
+                  );
+                }
+                Navigator.pop(context);
               },
+              child: const Text('Kaydet'),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (selectedDecision != null) {
-                context.read<ManagerCubit>().basvuruDurumGuncelle(
-                  basvuru.basvuruID,
-                  selectedDecision!,
-                );
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('Kaydet'),
-          ),
-        ],
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
-void _showDecisionDialog(Basvuru basvuru) {
-  final cubit = context.read<ManagerCubit>(); // Burada üstte cubit alıyoruz!
+  void _showDecisionDialog(Basvuru basvuru) {
+    final cubit = context.read<ManagerCubit>(); // Burada üstte cubit alıyoruz!
 
-  showDialog(
-    context: context,
-    builder: (dialogContext) {
-      return BlocProvider.value(
-        value: cubit,
-        child: _buildDecisionDialogContent(basvuru),
-      );
-    },
-  );
-}
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return BlocProvider.value(
+          value: cubit,
+          child: _buildDecisionDialogContent(basvuru),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -673,9 +652,9 @@ void _showDecisionDialog(Basvuru basvuru) {
       appBar: AppBar(title: const Text('İlan İnceleme')),
       body: BlocBuilder<ManagerCubit, YoneticiState>(
         builder: (context, state) {
-          if (state is YoneticiYukleniyor) {
+          if (state is YoneticiBasvurularYukleniyor) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is YoneticiBasvurularYuklendi) {
+          } else if (state is YoneticiBilgileriYuklendi) {
             final basvurular = state.basvurular;
             if (basvurular.isEmpty) {
               return const Center(child: Text('Henüz başvuru yapılmadı.'));
@@ -696,11 +675,15 @@ void _showDecisionDialog(Basvuru basvuru) {
                         Text(
                           '${basvuru.adayAdSoyad} - ${basvuru.ilanBaslik}',
                           style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text('Başvuru Tarihi: ${basvuru.basvuruTarihi}'),
-                        Text('İlan Süresi: ${basvuru.baslangicTarihi} - ${basvuru.bitisTarihi}'),
+                        Text(
+                          'İlan Süresi: ${basvuru.baslangicTarihi} - ${basvuru.bitisTarihi}',
+                        ),
                         Text('Durum: ${basvuru.durum}'),
                         Text('Toplam Puan: ${basvuru.toplamPuan}'),
                         const SizedBox(height: 12),
@@ -711,7 +694,9 @@ void _showDecisionDialog(Basvuru basvuru) {
                               onPressed: () {
                                 // Şimdilik sadece dosya varmış gibi gösteriyoruz
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('PDF dosyası indiriliyor...')),
+                                  const SnackBar(
+                                    content: Text('PDF dosyası indiriliyor...'),
+                                  ),
                                 );
                               },
                               icon: const Icon(Icons.picture_as_pdf),
@@ -751,185 +736,168 @@ class ManagerJuriAtamaEkrani extends StatefulWidget {
 }
 
 class _ManagerJuriAtamaEkraniState extends State<ManagerJuriAtamaEkrani> {
-  final TextEditingController _ilanController = TextEditingController(
-    text: "ilan1",
-  );
+  List<String?> selectedMembers = [];
 
   @override
-  void dispose() {
-    _ilanController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    context.read<ManagerCubit>().basvuruKriterYukle();
   }
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.watch<ManagerCubit>();
-    final String ilanId = _ilanController.text;
-    final List<JuriUyesi> juryList = cubit.getJuriListesi(ilanId);
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Jüri Atama'),
+        title: const Text('Jüri Atamaları'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-              onPressed: (){}
+            onPressed: () {
+              final managerCubit = context.read<ManagerCubit>();
+              showDialog(
+                context: context,
+                builder: (BuildContext dialogContext) {
+                  return BlocProvider.value(
+                    value: managerCubit,
+                    child: const AddKadroKriterDialog(),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _ilanController,
-              decoration: const InputDecoration(
-                labelText: 'İlan ID',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (_) {
-                setState(() {});
-              },
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Atanmış Jüri Üyeleri:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            Expanded(
-              child:
-                  juryList.isEmpty
-                      ? const Center(
-                        child: Text('Henüz jüri ataması yapılmadı.'),
-                      )
-                      : ListView.builder(
-                        itemCount: juryList.length,
-                        itemBuilder: (context, index) {
-                          final jury = juryList[index];
-                          return Card(
-                            child: ListTile(
-                              title: Text('${jury.adSoyad} (${jury.unvan})'),
-                              subtitle: Text(
-                                'TC: ${jury.tcKimlik} | Kurum: ${jury.kurum}',
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () {
-                                  cubit.juriSil(ilanId, jury.tcKimlik);
-                                  setState(() {});
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AddJuriDialog extends StatefulWidget {
-  final String ilanId;
-  // ignore: use_super_parameters
-  const AddJuriDialog({Key? key, required this.ilanId}) : super(key: key);
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _AddJuriDialogState createState() => _AddJuriDialogState();
-}
-
-class _AddJuriDialogState extends State<AddJuriDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _tcController = TextEditingController();
-  final TextEditingController _adSoyadController = TextEditingController();
-  final TextEditingController _unvanController = TextEditingController();
-  final TextEditingController _kurumController = TextEditingController();
-
-  @override
-  void dispose() {
-    _tcController.dispose();
-    _adSoyadController.dispose();
-    _unvanController.dispose();
-    _kurumController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cubit = context.read<ManagerCubit>();
-    return AlertDialog(
-      title: const Text('Yeni Jüri Üyesi Ekle'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _tcController,
-                decoration: const InputDecoration(labelText: 'TC Kimlik'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'TC Kimlik giriniz'
-                            : null,
-              ),
-              TextFormField(
-                controller: _adSoyadController,
-                decoration: const InputDecoration(labelText: 'Ad Soyad'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Ad Soyad giriniz'
-                            : null,
-              ),
-              TextFormField(
-                controller: _unvanController,
-                decoration: const InputDecoration(labelText: 'Ünvan'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty ? 'Ünvan giriniz' : null,
-              ),
-              TextFormField(
-                controller: _kurumController,
-                decoration: const InputDecoration(labelText: 'Kurum'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty ? 'Kurum giriniz' : null,
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('İptal'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              final jury = JuriUyesi(
-                tcKimlik: _tcController.text,
-                adSoyad: _adSoyadController.text,
-                unvan: _unvanController.text,
-                kurum: _kurumController.text,
+      body: BlocBuilder<ManagerCubit, YoneticiState>(
+        builder: (context, state) {
+          if (state is YoneticiKriterlerYukleniyor) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is YoneticiBilgileriYuklendi) {
+            if (state.kriterListesi.isEmpty) {
+              return const Center(
+                child: Text(
+                  'Henüz kriter eklenmedi.',
+                  style: TextStyle(fontSize: 16),
+                ),
               );
-              cubit.juriEkle(widget.ilanId, jury);
-              Navigator.pop(context);
             }
-          },
-          child: const Text('Kaydet'),
-        ),
-      ],
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: state.juriIlanListesi.length,
+              itemBuilder: (context, index) {
+                final juriIlan = state.juriIlanListesi[index];
+                // Initialize the selected member for this ilan if it doesn't exist
+                if (selectedMembers.length <= index) {
+                  selectedMembers.add(null); // Default to null
+                }
+
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          juriIlan.baslik,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Açıklama: ${juriIlan.aciklama}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Başlangıç Tarihi: ${juriIlan.baslangicTarihi}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Bitiş Tarihi: ${juriIlan.bitisTarihi}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Üye Seçim Dropdown
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          hint: Text('Üye Seçin'),
+                          value:
+                              selectedMembers[index], // Seçilen üye burada gösterilecek
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedMembers[index] =
+                                  newValue; // Seçilen üye güncelleniyor
+                            });
+                          },
+                          items:
+                              state.juriKullaniciListesi
+                                  .map<DropdownMenuItem<String>>((
+                                    juriKullanici,
+                                  ) {
+                                    return DropdownMenuItem<String>(
+                                      value: juriKullanici.juriAdSoyad,
+                                      child: Text('${juriKullanici.juriAdSoyad} ${juriKullanici.tcKimlik}'),
+                                    );
+                                  })
+                                  .toList(),
+                        ),
+                        const SizedBox(height: 16),
+                        // Seçilen Üye Gösterimi
+                        if (selectedMembers[index] != null)
+                          Column(
+                            children: [
+                              Text('Seçilen Üye: ${selectedMembers[index]}'),
+ElevatedButton(
+  onPressed: () {
+    final cubit = context.read<ManagerCubit>();
+
+    final juriAdSoyad = selectedMembers[index];
+    if (juriAdSoyad != null) {
+      // Seçilen jüri bilgilerini bul
+      final juri = state.juriKullaniciListesi.firstWhere(
+        (element) => element.juriAdSoyad == juriAdSoyad,
+      );
+
+      final atamaModel = JuriAtamaModel(
+        ilanID: juriIlan.ilanID,
+        tcKimlikNo: juri.tcKimlik,
+      );
+
+      cubit.juriAta(atamaModel);
+    }
+  },
+  child: const Text('Ata'),
+),
+
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          } else if (state is YoneticiHata) {
+            return Center(child: Text(state.mesaj));
+          }
+          return const Center(child: Text('Herhangi bir giriş yapılmadı.'));
+        },
+      ),
     );
   }
 }

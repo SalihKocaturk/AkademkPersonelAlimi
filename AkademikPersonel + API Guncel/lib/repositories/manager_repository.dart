@@ -152,4 +152,31 @@ class IlanRepository {
   });
 }
 }
+class JuriIlanRepository{
+    final Dio _dio = Dio(BaseOptions(baseUrl: 'http://localhost:3000'));
+
+    Future <List<JuriIlan>> juriIlanGetir() async{
+          final response = await _dio.get('/ilanlar');
+          final List<dynamic> data = response.data;
+          return data.map((e) => JuriIlan.fromJson(e)).toList();
+    }
+}
+
+class JuriKullaniciRepos{
+    final Dio _dio = Dio(BaseOptions(baseUrl: 'http://localhost:3000'));
+    Future <List<JuriKullanicilar>> juriKullanicilariGetir() async{
+          final response = await _dio.get('/kullanicijuri');
+          final List<dynamic> data = response.data;
+          return data.map((e) => JuriKullanicilar.fromJson(e)).toList();
+    }
+}
+class JuriAtamaRepository {
+  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://localhost:3000'));
+
+  Future<void> juriAta(JuriAtamaModel atamaModel) async {
+    await _dio.post('/juri-atama', data: atamaModel.toJson());
+  }
+}
+
+
 
