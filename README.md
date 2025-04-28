@@ -1,4 +1,4 @@
-# proje1
+# Yazılım Geliştirme Laboratuvarı II - Vize Projesi
 
 A new Flutter project.
 
