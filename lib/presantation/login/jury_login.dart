@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../domain/cubits/auth_cubit.dart';
 import '../../locator.dart';
-import '../widgets/date_picker_custom.dart';
-import '../widgets/textfield_custom.dart'; // getIt import
+import '../../widgets/date_picker_custom.dart';
+import '../../widgets/textfield_custom.dart'; // getIt import
 
 class JuryLogin extends StatefulWidget {
   const JuryLogin({super.key});

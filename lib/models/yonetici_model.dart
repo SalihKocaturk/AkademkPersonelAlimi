@@ -13,7 +13,6 @@ class KategoriKriter {
     this.maxPuan,
   });
 
-
   KategoriKriter copyWith({
     String? kod,
     int? gerekliAdet,
@@ -45,7 +44,6 @@ class JuriUyesi {
   });
 }
 
-
 class KadroKriter {
   final String kadroTuru;
   final List<KategoriKriter> kategoriKriterleri;
@@ -69,4 +67,5 @@ class KadroKriter {
     );
   }
 }
->>>>>>> 5c821c750a19a9ba4c3ea27150464bcc7ff958dc
+
+// >>>>>>> 5c821c750a19a9ba4c3ea27150464bcc7ff958dc

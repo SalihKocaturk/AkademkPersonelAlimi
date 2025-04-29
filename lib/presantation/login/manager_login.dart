@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../domain/cubits/auth_cubit.dart';
 import '../../locator.dart';
-import '../widgets/date_picker_custom.dart';
-import '../widgets/textfield_custom.dart';
+import '../../widgets/date_picker_custom.dart';
+import '../../widgets/textfield_custom.dart';
 
 class ManagerLogin extends StatefulWidget {
   const ManagerLogin({super.key});
