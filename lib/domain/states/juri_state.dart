@@ -1,25 +1,25 @@
-part of '../cubits/juri_cubit.dart';
+import '../../models/juri_model.dart';
 
-abstract class JuriState {}
+abstract class JuryState {}
 
-class JuriInitial extends JuriState {}
+class JuryInitial extends JuryState {}
 
-class JuriDegerlendirmeGuncellendi extends JuriState {
-  final String not;
-  final bool? kararOlumlu;
-  final String? dosyaYolu;
+class JuryLoading extends JuryState {}
 
-  JuriDegerlendirmeGuncellendi({
-    required this.not,
-    required this.kararOlumlu,
-    required this.dosyaYolu,
-  });
+class JuryLoaded extends JuryState {
+  final List<JuriBasvuru> basvurular;
+  final List<JuriDegerlendirmeModel> basvuruDegerlendirmeListesi;
+
+  JuryLoaded(this.basvurular, this.basvuruDegerlendirmeListesi);
 }
+class JuriDegerlendirmeBasarili extends JuryState{}
 
-class JuriDegerlendirmeEksik extends JuriState {
+class JuriDegerlendirmeHata extends JuryState {
   final String mesaj;
-
-  JuriDegerlendirmeEksik(this.mesaj);
+  JuriDegerlendirmeHata(this.mesaj);
+}
+class JuryError extends JuryState {
+  final String message;
+  JuryError(this.message);
 }
 
-class JuriDegerlendirmeTamamlandi extends JuriState {}

@@ -21,10 +21,12 @@ class AuthLoggedIn extends AuthState {
   final String ad;
   final String soyad;
   final String tc;
+  final int kullaniciId;
   AuthLoggedIn({
     required this.rol,
     required this.ad,
     required this.soyad,
     required this.tc,
+    required this.kullaniciId,
   });
 }

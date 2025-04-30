@@ -25,6 +25,7 @@ class AuthCubit extends Cubit<AuthState> {
             ad: data['ad'],
             soyad: data['soyad'],
             tc: data['tc'],
+            kullaniciId: data['kullaniciID'],
           ),
         );
       } else {
@@ -85,7 +86,6 @@ class AuthCubit extends Cubit<AuthState> {
       print('SOAP Hatası: $e');
     }
 
-    // Her durumda veritabanına kayıt yapılacak
     try {
       final dbResponse = await http.post(
         Uri.parse('http://localhost:3000/register'),
@@ -117,4 +117,8 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthFailure('Veritabanı hatası: $e'));
     }
   }
+  void logout() {
+  emit(AuthInitial());
+}
+
 }

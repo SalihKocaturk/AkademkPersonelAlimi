@@ -1,63 +1,74 @@
-// admin_cubit.dart
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:proje1/models/announcment.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+
+import '../../models/announcment1.dart';
 part '../states/admin_state.dart';
 
 class AdminCubit extends Cubit<AdminState> {
   AdminCubit() : super(AdminInitial()) {
     loadAnnouncements();
   }
-  void updateAnnouncement(Announcement updated) {
-    if (state is AdminLoaded) {
-      final current = (state as AdminLoaded).announcements;
-      final index = current.indexWhere((ann) => ann.id == updated.id);
-      if (index != -1) {
-        final updatedList = List<Announcement>.from(current);
-        updatedList[index] = updated;
-        emit(AdminLoaded(updatedList));
-      }
-    }
-  }
 
   Future<void> loadAnnouncements() async {
     emit(AdminLoading());
-    final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getString('announcements');
-    if (data != null) {
-      final decoded = jsonDecode(data) as List;
-      final list = decoded.map((e) => Announcement.fromJson(e)).toList();
-      emit(AdminLoaded(list));
-    } else {
+    try {
+      final response = await http.get(
+        Uri.parse('http://localhost:3000/announcements'),
+      );
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        final List decoded = jsonDecode(response.body);
+        print(decoded.length);
+
+        final list = decoded.map((e) => Announcement1.fromJson(e)).toList();
+        print(list.length);
+        emit(AdminLoaded(list));
+      } else {
+        emit(AdminLoaded([]));
+      }
+    } catch (e) {
       emit(AdminLoaded([]));
     }
   }
 
-  Future<void> addAnnouncement(Announcement a) async {
-    final currentState = state;
-    if (currentState is AdminLoaded) {
-      final updated = [...currentState.announcements, a];
-      await _save(updated);
-      emit(AdminLoaded(updated));
+  Future<void> addAnnouncement(Announcement1 a) async {
+    try {
+      final data = a.toJson();
+      print("Gönderilen veri: $data");
+      await http.post(
+        Uri.parse('http://localhost:3000/announcements'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
+      );
+      print(jsonEncode(data));
+      loadAnnouncements();
+    } catch (e) {
+      print("Hata addAnnouncement içinde: $e"); 
     }
   }
 
   Future<void> deleteAnnouncement(String id) async {
-    final currentState = state;
-    if (currentState is AdminLoaded) {
-      final updated =
-          currentState.announcements.where((e) => e.id != id).toList();
-      await _save(updated);
-      emit(AdminLoaded(updated));
-    }
+    try {
+      await http.delete(Uri.parse('http://localhost:3000/announcements/$id'));
+      loadAnnouncements();
+    } catch (_) {}
   }
 
-  Future<void> _save(List<Announcement> list) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      'announcements',
-      jsonEncode(list.map((e) => e.toJson()).toList()),
-    );
+  Future<void> updateAnnouncement(Announcement1 a) async {
+    try {
+      print(a.title);
+      final data = a.toJson();
+      print(data.isEmpty);
+      print(data);
+      await http.put(
+        Uri.parse('http://localhost:3000/announcements/${a.id}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
+      );
+      loadAnnouncements();
+    } catch (e) {
+      print("Güncelleme hatası: $e");
+    }
   }
 }

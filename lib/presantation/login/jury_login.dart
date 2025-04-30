@@ -4,8 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../domain/cubits/auth_cubit.dart';
 import '../../locator.dart';
-import '../../widgets/date_picker_custom.dart';
-import '../../widgets/textfield_custom.dart'; // getIt import
+import '../widgets/date_picker_custom.dart';
+import '../widgets/textfield_custom.dart';
+
 
 class JuryLogin extends StatefulWidget {
   const JuryLogin({super.key});
@@ -217,7 +218,7 @@ class _JuryLoginState extends State<JuryLogin> {
     );
   }
 
-  Widget _buildTextField(
+  /*Widget _buildTextField(
     TextEditingController controller,
     String label,
     TextInputType type, {
@@ -232,9 +233,9 @@ class _JuryLoginState extends State<JuryLogin> {
         border: const OutlineInputBorder(),
       ),
     );
-  }
+  }*/
 
-  Widget _buildDatePickerField(
+  /*Widget _buildDatePickerField(
     BuildContext context,
     TextEditingController controller,
     String label,
@@ -261,5 +262,5 @@ class _JuryLoginState extends State<JuryLogin> {
         ),
       ),
     );
-  }
+  }*/
 }

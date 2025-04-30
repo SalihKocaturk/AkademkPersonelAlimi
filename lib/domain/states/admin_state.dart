@@ -8,6 +8,6 @@ class AdminInitial extends AdminState {}
 class AdminLoading extends AdminState {}
 
 class AdminLoaded extends AdminState {
-  final List<Announcement> announcements;
+  final List<Announcement1> announcements;
   AdminLoaded(this.announcements);
 }

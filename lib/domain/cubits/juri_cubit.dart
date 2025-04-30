@@ -1,53 +1,40 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-part '../states/juri_state.dart';
+import '../../models/juri_model.dart';
+import '../../repositories/jury_repository.dart';
+import '../states/juri_state.dart';
 
-class JuriCubit extends Cubit<JuriState> {
-  JuriCubit() : super(JuriInitial());
+class JuryCubit extends Cubit<JuryState> {
+    JuryCubit() : super(JuryInitial());
 
-  String _degerlendirmeNotu = '';
-  bool? _kararOlumlu;
-  String? _yuklenenDosyaYolu;
+  final JuryRepository _repo = JuryRepository();
+  final JuriDegerlendirmeRepository _degerlendirmeRepo = JuriDegerlendirmeRepository();
 
-  void notGuncelle(String not) {
-    _degerlendirmeNotu = not;
-    emit(
-      JuriDegerlendirmeGuncellendi(
-        not: _degerlendirmeNotu,
-        kararOlumlu: _kararOlumlu,
-        dosyaYolu: _yuklenenDosyaYolu,
-      ),
-    );
-  }
+  
+void juryBasvurulariGetir() async {
+  emit(JuryLoading());
+  try {
+    final basvurular = await _repo.juriBasvurulariniGetir();
 
-  void kararGuncelle(bool olumluMu) {
-    _kararOlumlu = olumluMu;
-    emit(
-      JuriDegerlendirmeGuncellendi(
-        not: _degerlendirmeNotu,
-        kararOlumlu: _kararOlumlu,
-        dosyaYolu: _yuklenenDosyaYolu,
-      ),
-    );
-  }
-
-  void dosyaYukle(String yol) {
-    _yuklenenDosyaYolu = yol;
-    emit(
-      JuriDegerlendirmeGuncellendi(
-        not: _degerlendirmeNotu,
-        kararOlumlu: _kararOlumlu,
-        dosyaYolu: _yuklenenDosyaYolu,
-      ),
-    );
-  }
-
-  void tamamlaDegerlendirme() {
-    if (_degerlendirmeNotu.isNotEmpty &&
-        _kararOlumlu != null &&
-        _yuklenenDosyaYolu != null) {
-      emit(JuriDegerlendirmeTamamlandi());
+    if (basvurular.isEmpty) {
+      print('🟥 Gelen liste boş.');
     } else {
-      emit(JuriDegerlendirmeEksik('Lütfen tüm alanları doldurun.'));
+      for (var basvuru in basvurular) {
+        print('Başvuru Başlığı: ${basvuru.ilanBaslik}');
+      }
     }
+
+    emit(JuryLoaded(basvurular, []));
+  } catch (e) {
+    print('🟥 Hata yakalandı: $e');
+    emit(JuryError('Başvurular yüklenemedi: $e'));
   }
+}
+void degerlendirmeGonder(JuriDegerlendirmeModel degerlendirme) async {
+  try {
+    await _degerlendirmeRepo.degerlendirmeYolla(degerlendirme);
+    juryBasvurulariGetir();
+    } catch (e) {
+    emit(JuriDegerlendirmeHata('Değerlendirme kaydedilemedi: $e'));
+  }
+}
 }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proje1/application/candidate_application.dart';
+import 'package:proje1/domain/cubits/auth_cubit.dart';
+import 'package:proje1/domain/cubits/juri_cubit.dart';
 import 'package:proje1/locator.dart';
 import 'package:proje1/presantation/home/admin_home.dart';
 import 'package:proje1/presantation/home/candidate_home.dart';
@@ -13,9 +17,19 @@ import 'presantation/login/jury_login.dart';
 import 'presantation/login/manager_login.dart';
 
 void main() {
-  setupLocators();
-  runApp(const MyApp());
+  setupLocators(); // getIt
+
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<AuthCubit>()),
+        BlocProvider(create: (_) => getIt<JuryCubit>()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
+
 
 final GoRouter _router = GoRouter(
   routes: [
@@ -46,6 +60,18 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const ManagerHome(),
     ),
     GoRoute(path: '/home/jury', builder: (context, state) => const JuryHome()),
+    GoRoute(
+      path: '/applications/candidate',
+      name: 'candidateApplication',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, String>?;
+
+        final adSoyad = extra?['adSoyad'] ?? '';
+        final ilanBaslik = extra?['ilanBaslik'] ?? '';
+
+        return CandidateApplication(adSoyad: adSoyad, ilanBaslik: ilanBaslik);
+      },
+    ),
   ],
 );
 

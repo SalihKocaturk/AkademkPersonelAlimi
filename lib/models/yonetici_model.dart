@@ -1,32 +1,76 @@
 class KategoriKriter {
   final String kod;
   final int gerekliAdet;
-  final bool zorunluMu;
   final double? minPuan;
   final double? maxPuan;
 
   KategoriKriter({
     required this.kod,
     required this.gerekliAdet,
-    required this.zorunluMu,
     this.minPuan,
     this.maxPuan,
   });
 
-  KategoriKriter copyWith({
-    String? kod,
-    int? gerekliAdet,
-    bool? zorunluMu,
-    double? minPuan,
-    double? maxPuan,
-  }) {
+factory KategoriKriter.fromJson(Map<String, dynamic> json) {
+    double toDouble(dynamic value) {
+      if (value is num) return value.toDouble();
+      if (value is String) return double.tryParse(value) ?? 0.0;
+      return 0.0;
+    }
+
     return KategoriKriter(
-      kod: kod ?? this.kod,
-      gerekliAdet: gerekliAdet ?? this.gerekliAdet,
-      zorunluMu: zorunluMu ?? this.zorunluMu,
-      minPuan: minPuan ?? this.minPuan,
-      maxPuan: maxPuan ?? this.maxPuan,
+      kod: json['kod'] ?? '',
+      gerekliAdet: int.tryParse(json['gerekliAdet'].toString()) ?? 0,
+      minPuan: toDouble(json['minPuan']),
+      maxPuan: toDouble(json['maxPuan']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'kod': kod,
+      'gerekliAdet': gerekliAdet,
+      'minPuan': minPuan,
+      'maxPuan': maxPuan,
+    };
+  }
+}
+
+class KadroKriter {
+  final int kriterID;
+  final String kadroTuru;
+  final String temelAlan;
+  final List<KategoriKriter> kategoriKriterleri;
+  final double minToplamPuan;
+
+  KadroKriter({
+    required this.kriterID,
+    required this.kadroTuru,
+    required this.temelAlan,
+    required this.kategoriKriterleri,
+    required this.minToplamPuan,
+  });
+
+  factory KadroKriter.fromJson(Map<String, dynamic> json) {
+    var list = json['kategoriKriterleri'] as List<dynamic>? ?? [];
+    List<KategoriKriter> kategoriListesi = list.map((e) => KategoriKriter.fromJson(e)).toList();
+
+    return KadroKriter(
+      kriterID: json['KriterID'] ?? 0,
+      kadroTuru: json['kadroTuru'] ?? '',
+      temelAlan: json['temelAlan'] ?? '',
+      kategoriKriterleri: kategoriListesi,
+      minToplamPuan: (json['minToplamPuan'] != null) ? (json['minToplamPuan'] as num).toDouble() : 0.0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'kadroTuru': kadroTuru,
+      'temelAlan': temelAlan,
+      'kategoriKriterleri': kategoriKriterleri.map((e) => e.toJson()).toList(),
+      'minToplamPuan': minToplamPuan,
+    };
   }
 }
 
@@ -42,30 +86,139 @@ class JuriUyesi {
     required this.unvan,
     required this.kurum,
   });
-}
 
-class KadroKriter {
-  final String kadroTuru;
-  final List<KategoriKriter> kategoriKriterleri;
-  final double minToplamPuan;
-
-  KadroKriter({
-    required this.kadroTuru,
-    required this.kategoriKriterleri,
-    required this.minToplamPuan,
-  });
-
-  KadroKriter copyWith({
-    String? kadroTuru,
-    List<KategoriKriter>? kategoriKriterleri,
-    double? minToplamPuan,
-  }) {
-    return KadroKriter(
-      kadroTuru: kadroTuru ?? this.kadroTuru,
-      kategoriKriterleri: kategoriKriterleri ?? this.kategoriKriterleri,
-      minToplamPuan: minToplamPuan ?? this.minToplamPuan,
+  factory JuriUyesi.fromJson(Map<String, dynamic> json) {
+    return JuriUyesi(
+      tcKimlik: json['tcKimlik'] ?? '',
+      adSoyad: json['adSoyad'] ?? '',
+      unvan: json['unvan'] ?? '',
+      kurum: json['kurum'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tcKimlik': tcKimlik,
+      'adSoyad': adSoyad,
+      'unvan': unvan,
+      'kurum': kurum,
+    };
   }
 }
 
-// >>>>>>> 5c821c750a19a9ba4c3ea27150464bcc7ff958dc
+//------------BAŞVURULARI İNCELE-----------------
+
+class JuriKullanicilar{
+  final int? kullaniciID;
+  final String juriAdSoyad;
+  final String? tcKimlik;
+
+
+  JuriKullanicilar({
+    required this.kullaniciID,
+    required this.juriAdSoyad,
+    required this.tcKimlik,
+  });
+  factory JuriKullanicilar.fromJson(Map<String, dynamic> json){
+    return JuriKullanicilar(
+      kullaniciID: json['kullaniciID'],
+      juriAdSoyad: '${json['Ad']} ${json['Soyad']}',
+      tcKimlik: json['TCKimlikNo'],
+
+      );
+  }
+}
+
+class JuriIlan{
+  final int? ilanID;
+  final String baslik;
+  final String aciklama;
+  final String baslangicTarihi;
+  final String bitisTarihi;
+
+  JuriIlan({
+    required this.ilanID,
+    required this.baslik,
+    required this.aciklama,
+    required this.baslangicTarihi,
+    required this.bitisTarihi
+
+  });
+
+  factory JuriIlan.fromJson(Map<String, dynamic> json) {
+  return JuriIlan(
+    ilanID: json['IlanID'],
+    baslik: json['Baslik'],
+    aciklama: json['Aciklama'],
+    baslangicTarihi: json['BaslangicTarihi'],
+    bitisTarihi: json['BitisTarihi']
+  );
+}
+}
+
+class JuriAtamaModel {
+  final int? ilanID;
+  final String? tcKimlikNo;
+
+  JuriAtamaModel({
+    required this.ilanID,
+    required this.tcKimlikNo,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'IlanID': ilanID,
+      'TCKimlikNo': tcKimlikNo,
+    };
+  }
+}
+
+
+class Basvuru {
+  final int basvuruID;
+  final String adayAdSoyad;
+  final String ilanBaslik;
+  final int ilanID;
+  final String basvuruTarihi;
+  final String baslangicTarihi;
+  final String bitisTarihi;
+  final String durum;
+  final double toplamPuan;
+  final String sonGuncelleme;
+
+  Basvuru({
+    required this.basvuruID,
+    required this.adayAdSoyad,
+    required this.ilanBaslik,
+    required this.ilanID,
+    required this.basvuruTarihi,
+    required this.baslangicTarihi,
+    required this.bitisTarihi,
+    required this.durum,
+    required this.toplamPuan,
+    required this.sonGuncelleme,
+  });
+
+factory Basvuru.fromJson(Map<String, dynamic> json) {
+  double toDouble(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
+  return Basvuru(
+    basvuruID: json['BasvuruID'],
+    adayAdSoyad: '${json['AdayAd']} ${json['AdaySoyad']}',
+    ilanBaslik: json['IlanBaslik'],
+    ilanID: json['IlanID'],
+    basvuruTarihi: json['BasvuruTarihi'],
+    baslangicTarihi: json['BaslangicTarihi'],
+    bitisTarihi: json['BitisTarihi'],
+    durum: json['Durum'],
+    toplamPuan: toDouble(json['ToplamPuan']), 
+    sonGuncelleme: json['SonGuncelleme'],
+  );
+}
+}
+
+
