@@ -1,16 +1,10 @@
 # Yazılım Geliştirme Laboratuvarı II - Vize Projesi
 
-A new Flutter project.
+Bu projede üniversite alanları için farklı kadro türleri üzerinden akademik kadro alım sistemi hedeflenmiştir. Yükseköğretim kurumlarında akademik personel alım süreçleri, hem adaylar hem de değerlendirme kurulları açısından oldukça hassas, zaman alıcı ve bürokratik işlemlerle doludur. Bu süreçlerin dijital ortama taşınarak daha şeffaf, hızlı ve izlenebilir hale getirilmesi gerekliliği, modern üniversite yönetim sistemlerinin önemli bir ihtiyacı haline gelmiştir. Bu doğrultuda geliştirilen Akademik Personel Başvuru Sistemi, Kocaeli Üniversitesi Akademik Atama Yönergesi esas alınarak, öğretim üyeliği kadrolarına 
+yapılacak başvuruların elektronik ortamda yönetilmesini sağlayan kapsamlı bir dijital çözümdür.
+Sistem; adayların başvuru yapabildiği, yöneticilerin başvuru kriterlerini tanımlayabildiği, jüri üyelerinin değerlendirme yapabildiği ve admin kullanıcıların ilan süreçlerini yönetebildiği dört ana kullanıcı rolü etrafında inşa edilmiştir. Her rolün kendine özgü işlevleri, ekranları ve yetkileri sistem içinde detaylı biçimde tanımlanmıştır.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Adaylar, kişisel bilgileri ve belgeleri ile ilanlara başvuru yapabilir, bilimsel faaliyetlerini sistem üzerinden beyan ederek otomatik puanlama alabilir ve tüm başvuru sürecini anlık olarak takip edebilir. Yöneticiler, ilana özel kriterleri girerek başvuruların yönergeye uygun biçimde değerlendirilmesini sağlar.
+Jüri üyeleri ise yalnızca atandıkları başvuruları görebilir ve değerlendirme raporlarını sisteme yükleyebilir.
+Admin kullanıcılar ise ilan ekleme, düzenleme ve sistem yönetimi gibi temel işlemleri gerçekleştirir. Böylece sistem, akademik personel alım sürecini hem kullanıcı dostu hem de mevzuata uygun bir şekilde dijitalleştirerek; insan hatalarını en aza indirir, belge takibini kolaylaştırır ve değerlendirme süreçlerini daha objektif hale getirir. Geliştirilen bu sistem, yalnızca bir başvuru aracı değil; aynı zamanda
+üniversitelerin dijital dönüşüm vizyonunu destekleyen yenilikçi bir altyapıdır. 
